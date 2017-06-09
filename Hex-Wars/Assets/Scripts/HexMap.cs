@@ -20,8 +20,10 @@ public class HexMap : MonoBehaviour
 
     public Material[] HexMats;
 
-    int iNumColumns = 20;
-    int iNumRows = 40;
+    public readonly int iNumColumns = 20;
+    public readonly int iNumRows = 40;
+
+    public List<HexComponent> hexes;
 
 
     public void GenerateMap()
@@ -32,13 +34,18 @@ public class HexMap : MonoBehaviour
             {
                 Hex hex = new Hex(column, row);
 
-                GameObject go_Hex = Instantiate(go_HexPrefab, hex.GetHexPosition(), Quaternion.identity, this.transform);
+                Vector3 spawnPos = hex.GetPositionFromCamera(Camera.main.transform.position, iNumRows, iNumColumns);
+
+                GameObject go_Hex = Instantiate(go_HexPrefab, spawnPos, Quaternion.identity, this.transform);
+
+                go_Hex.GetComponent<HexComponent>().hexRef = hex;
+                go_Hex.GetComponent<HexComponent>().hexMap = this;
+
+                hexes.Add(go_Hex.GetComponent<HexComponent>());
 
                 MeshRenderer mr_Hex = go_Hex.GetComponentInChildren<MeshRenderer>();
                 mr_Hex.material = HexMats[Random.Range(0, HexMats.Length)];
             }
         }
-
-        StaticBatchingUtility.Combine(this.gameObject);
     }
 }

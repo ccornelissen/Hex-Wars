@@ -8,6 +8,9 @@ public class Hex{
     public readonly int iRow;
     public readonly int iSum;
 
+    bool bAllowWrapEastWest = true;
+    bool bAllowWrapNorthSouth = true;
+
     public Hex (int column, int row)
     {
         this.iColumn = column;
@@ -52,9 +55,44 @@ public class Hex{
 
         Vector3 position = GetHexPosition();
 
-        float widthFromCamera = (position.x - cameraPosition.x) / mapWidth;
+        if(bAllowWrapEastWest)
+        {
+            float widthFromCamera = (position.x - cameraPosition.x) / mapWidth;
+
+            if (widthFromCamera > 0)
+            {
+                widthFromCamera += 0.5f;
+            }
+            else
+            {
+                widthFromCamera -= 0.5f;
+            }
+
+            int widthToCamera = (int)widthFromCamera;
+
+            position.x -= widthToCamera * mapWidth;
+        }
+
+        if (bAllowWrapNorthSouth)
+        {
+            float heightFromCamera = (position.z - cameraPosition.z) / mapHeight;
+
+            if (heightFromCamera > 0)
+            {
+                heightFromCamera += 0.5f;
+            }
+            else
+            {
+                heightFromCamera -= 0.5f;
+            }
+
+            int heightToCamera = (int)heightFromCamera;
+
+            position.z -= heightToCamera * mapHeight;
+        }
 
 
+        return position;
     }
 
 
