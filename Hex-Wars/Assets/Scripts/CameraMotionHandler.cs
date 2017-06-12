@@ -2,16 +2,20 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class CameraMotionHandler : MonoBehaviour {
-
+public class CameraMotionHandler : MonoBehaviour
+{
     public HexMap hexMap;
 
     Vector3 oldPosition;
+
+    HexComponent[] HexComps;
 
     // Use this for initialization
     void Start ()
     {
         oldPosition = this.transform.position;
+
+        HexComps = GameObject.FindObjectsOfType<HexComponent>();
     }
 
 	// Update is called once per frame
@@ -29,13 +33,14 @@ public class CameraMotionHandler : MonoBehaviour {
         //TODO: Move camera to hex
     }
 
+    //If the camera is moving update all hexes to Wrap
     void CheckIfCameraMoved()
     {
         if(oldPosition != this.transform.position)
         {
             oldPosition = this.transform.position;
 
-            foreach(HexComponent hexComp in hexMap.hexes)
+            foreach(HexComponent hexComp in HexComps)
             {
                 hexComp.UpdatePosition(); 
             }
