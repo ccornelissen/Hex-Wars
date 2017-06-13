@@ -10,8 +10,8 @@ public class Hex
     public readonly int iSum;
 
     //Data for map generation and in-game effects
-    public float Elevation;
-    public float Moisture;
+    public float fElevation;
+    public float fMoisture;
 
     //Bool to control hex movement
     public bool bAllowWrapEastWest = true;

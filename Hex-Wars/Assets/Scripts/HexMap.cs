@@ -15,15 +15,15 @@ public class HexMap : MonoBehaviour
 
     public GameObject go_HexPrefab;
 
-    public Mesh MeshOcean;
-    public Mesh MeshFlat;
-    public Mesh MeshHill;
-    public Mesh MeshMountain;
+    public Mesh meshOcean;
+    public Mesh meshFlat;
+    public Mesh meshHill;
+    public Mesh meshMountain;
 
-    public Material MatOcean;
-    public Material MatPlains;
-    public Material MatGrasslands;
-    public Material MatMountains;
+    public Material matOcean;
+    public Material matPlains;
+    public Material matGrasslands;
+    public Material matMountains;
 
     public readonly int iNumRows = 30;
     public readonly int iNumColumns = 60;
@@ -31,7 +31,7 @@ public class HexMap : MonoBehaviour
     private Hex[,] hexes;
     private Dictionary<Hex, GameObject> hexToGameObjectMap;
 
-    public Hex GetHexAt(int x, int y)
+    public Hex GetHexAt(int c, int r)
     {
         //Throw error if the array is empty
         if(hexes == null)
@@ -43,16 +43,16 @@ public class HexMap : MonoBehaviour
         //Return the divisible if wrapping is on. To stop from returning decimals or negative numbers
         if(bAllowWrapEastWest)
         {
-            x = x % iNumRows;
+            c = c % iNumColumns;
         }
 
         if(bAllowWrapNorthSouth)
         {
-            y = y % iNumColumns;
+            r = r % iNumRows;
         }
 
         //Return the requested hex
-        return hexes[x, y];
+        return hexes[c, r];
     }
 
     virtual public void GenerateMap()
@@ -68,6 +68,7 @@ public class HexMap : MonoBehaviour
             {
                 //Create the hex
                 Hex hex = new Hex(column, row);
+                hex.fElevation = -1.0f;
 
                 //Add the hex to the hexes array
                 hexes[column, row] = hex;
@@ -92,15 +93,72 @@ public class HexMap : MonoBehaviour
 
                 //Add the coordinates to the hexes text mesh
                 go_Hex.GetComponentInChildren<TextMesh>().text = string.Format("{0}, {1}", column, row);
+            }
+        }
+    }
+
+    public void UpdateHexVisuals()
+    {
+        for (int column = 0; column < iNumColumns; column++)
+        {
+            for (int row = 0; row < iNumRows; row++)
+            {
+                //Get the Hex
+                Hex hex = hexes[column, row];
+
+                GameObject go_Hex = hexToGameObjectMap[hex];
 
                 //Set the hex mat
                 MeshRenderer mr_Hex = go_Hex.GetComponentInChildren<MeshRenderer>();
-                mr_Hex.material = MatOcean;
+                if (hex.fElevation >= 0.0f)
+                {
+                    mr_Hex.material = matGrasslands;
+                }
+                else
+                {
+                    mr_Hex.material = matOcean;
+                }
 
                 //Set the hex mesh
                 MeshFilter mf_Hex = go_Hex.GetComponentInChildren<MeshFilter>();
-                mf_Hex.mesh = MeshOcean;
+                mf_Hex.mesh = meshOcean;
             }
         }
+    }
+
+    public Hex[] GetHexesWithinRadiusOf(Hex centerHex, int radius)
+    {
+        List<Hex> results = new List<Hex>();
+
+        for(int dx = -radius+1; dx < radius; dx++)
+        {
+            for(int dy = Mathf.Max(-radius+1, -dx-radius); dy < Mathf.Min(radius, -dx+radius); dy++)
+            {
+                int c;
+                int r;
+
+                if(centerHex.iColumn + dx >= iNumColumns)
+                {
+                    c = (centerHex.iColumn + dx) - iNumColumns;
+                }
+                else
+                {
+                    c = centerHex.iColumn + dx;
+                }
+
+                if (centerHex.iRow + dy >= iNumRows)
+                {
+                    r = centerHex.iRow + dy - iNumRows;
+                }
+                else
+                {
+                    r = centerHex.iRow + dy;
+                }
+
+                results.Add(hexes[c, r]);
+            }
+        }
+
+        return results.ToArray();
     }
 }

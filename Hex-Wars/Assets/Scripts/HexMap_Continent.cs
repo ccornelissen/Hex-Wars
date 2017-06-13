@@ -10,17 +10,27 @@ public class HexMap_Continent : HexMap
         base.GenerateMap();
 
         //Make some kind of raised area
-        ElevateArea(21, 15, 6);
+        ElevateArea(58, 4, 4);
 
         //Add bumpiness. Perlin Noise?
 
         //Set mesh to appropriate mat based on height
 
         //Simulate rainfall/moisture and set plains/grasslands + forest
+
+        //Make sure hex visuals are updated to match data
+        UpdateHexVisuals();
     }
 
     void ElevateArea(int c, int r, int radius)
     {
+        Hex centerHex = GetHexAt(c, r);
 
+        Hex[] areaHexes = GetHexesWithinRadiusOf(centerHex, radius);
+
+        foreach(Hex h in areaHexes)
+        {
+            h.fElevation = 0.5f;
+        }
     }
 }
