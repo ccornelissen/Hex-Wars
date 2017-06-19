@@ -31,7 +31,7 @@ public class HexMap : MonoBehaviour
     private Hex[,] hexes;
     private Dictionary<Hex, GameObject> hexToGameObjectMap;
 
-    public Hex GetHexAt(int c, int r)
+    public Hex GetHexAt(int x, int y)
     {
         //Throw error if the array is empty
         if(hexes == null)
@@ -43,16 +43,25 @@ public class HexMap : MonoBehaviour
         //Return the divisible if wrapping is on. To stop from returning decimals or negative numbers
         if(bAllowWrapEastWest)
         {
-            c = c % iNumColumns;
+            x = x % iNumColumns;
+            if(x < 0)
+            {
+                x += iNumColumns;
+            }
         }
 
         if(bAllowWrapNorthSouth)
         {
-            r = r % iNumRows;
+            y = y % iNumRows;
+
+            if(y < 0)
+            {
+                y += iNumRows;
+            }
         }
 
         //Return the requested hex
-        return hexes[c, r];
+        return hexes[x, y];
     }
 
     virtual public void GenerateMap()
@@ -68,7 +77,7 @@ public class HexMap : MonoBehaviour
             {
                 //Create the hex
                 Hex hex = new Hex(column, row);
-                hex.fElevation = -1.0f;
+                hex.fElevation = -0.5f;
 
                 //Add the hex to the hexes array
                 hexes[column, row] = hex;
@@ -110,7 +119,16 @@ public class HexMap : MonoBehaviour
 
                 //Set the hex mat
                 MeshRenderer mr_Hex = go_Hex.GetComponentInChildren<MeshRenderer>();
-                if (hex.fElevation >= 0.0f)
+
+                if (hex.fElevation >= 0.8f)
+                {
+                    mr_Hex.material = matMountains;
+                }
+                else if (hex.fElevation >= 0.4f)
+                {
+                    mr_Hex.material = matPlains;
+                }
+                else if(hex.fElevation >= 0.1f)
                 {
                     mr_Hex.material = matGrasslands;
                 }
@@ -130,32 +148,18 @@ public class HexMap : MonoBehaviour
     {
         List<Hex> results = new List<Hex>();
 
-        for(int dx = -radius+1; dx < radius; dx++)
+        for(int dx = -radius + 1; dx < radius; dx++)
         {
-            for(int dy = Mathf.Max(-radius+1, -dx-radius); dy < Mathf.Min(radius, -dx+radius); dy++)
+            for(int dy = Mathf.Max(-radius + 1, -dx-radius + 1); dy < Mathf.Min(radius, -dx+radius); dy++)
             {
                 int c;
                 int r;
 
-                if(centerHex.iColumn + dx >= iNumColumns)
-                {
-                    c = (centerHex.iColumn + dx) - iNumColumns;
-                }
-                else
-                {
-                    c = centerHex.iColumn + dx;
-                }
+                c = centerHex.iColumn + dx;
 
-                if (centerHex.iRow + dy >= iNumRows)
-                {
-                    r = centerHex.iRow + dy - iNumRows;
-                }
-                else
-                {
-                    r = centerHex.iRow + dy;
-                }
+                r = centerHex.iRow + dy;
 
-                results.Add(hexes[c, r]);
+                results.Add(GetHexAt(c, r));
             }
         }
 

@@ -109,5 +109,12 @@ public class Hex
         return position;
     }
 
+    public static float Distance(Hex a, Hex b)
+    {
+        //FIX ME: For Wrapping
+
+        return Mathf.Max(Mathf.Abs(a.iColumn - b.iColumn), Mathf.Abs(a.iRow - b.iRow), Mathf.Abs(a.iSum - b.iSum));
+    }
+
 
 }
