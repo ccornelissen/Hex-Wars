@@ -25,6 +25,12 @@ public class HexMap : MonoBehaviour
     public Material matGrasslands;
     public Material matMountains;
 
+    //Tiles above this float become the respective name
+    public float fHeightMountain = 0.85f;
+    public float fHeightPlains = 0.6f;
+    public float fHeightFlat = 0.2f;
+
+
     public readonly int iNumRows = 30;
     public readonly int iNumColumns = 60;
 
@@ -120,15 +126,15 @@ public class HexMap : MonoBehaviour
                 //Set the hex mat
                 MeshRenderer mr_Hex = go_Hex.GetComponentInChildren<MeshRenderer>();
 
-                if (hex.fElevation >= 0.8f)
+                if (hex.fElevation >= fHeightMountain)
                 {
                     mr_Hex.material = matMountains;
                 }
-                else if (hex.fElevation >= 0.4f)
+                else if (hex.fElevation >= fHeightPlains)
                 {
                     mr_Hex.material = matPlains;
                 }
-                else if(hex.fElevation >= 0.1f)
+                else if(hex.fElevation >= fHeightFlat)
                 {
                     mr_Hex.material = matGrasslands;
                 }
